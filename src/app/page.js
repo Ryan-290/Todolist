@@ -11,7 +11,7 @@ export default function Home() {
     <div className="todo-container">
         <div className="todo-text">
             <p className="body1">할 일(To-Do)</p>
-            <p className="body1" style={{flexGrow:1}}>001</p>
+            <p className="body1" style={{flexGrow:1}}>002</p>
             <CreateButton/>
         </div>
         <TodoCard/>
@@ -20,7 +20,7 @@ export default function Home() {
     <div className="ing-container">
         <div className="ing-text">
             <p className="body1">진행 중(-ing)</p>
-            <p className="body1" style={{flexGrow:1}}>001</p>
+            <p className="body1" style={{flexGrow:1}}>003</p>
         </div>
         <TodoCard/>
     </div>
@@ -28,7 +28,7 @@ export default function Home() {
     <div className="end-container">
         <div className="end-text">
             <p className="body1">완료(End)</p>
-            <p className="body1" style={{flexGrow:1}}>001</p>
+            <p className="body1" style={{flexGrow:1}}>004</p>
         </div>
         <TodoCard/>
     </div>
