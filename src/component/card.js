@@ -5,52 +5,37 @@ import Image from "next/image";
 import { useEffect , useState } from "react";
 import Link from "next/link";
 import { loadTodos } from "@/lib/firebaseUtils";
+import { getAllDocs } from "@/lib/firebaseUtils"
 
-export function TodoCard() {
-    const [create, setCreate] = useState(false);
-    const [todo, setTodo] = useState([]);
-
-        const fetchTodos = async ()=>  {
-            const data = await loadTodos();
-            setTodo(data);
-        };
-        fetchTodos();
-
-    return (
+export function TodoCardlist () {
+    const [todos, setTodos] = useState([]);
+    useEffect(() => {
+        console.log("🔥 컴포넌트 마운트됨");
+        const unsubscribe = loadTodos((data) => {
+        console.log("데이터 확인 2", data)
+          setTodos(data);
+        });
+        return () => unsubscribe();
+      }, []);
+    
+      return (
         <div>
-
-            <div onClick={()=>setCreate(true)}>
-            {todo.map((todo) => (
-                <div key={todo.id} className="card-container">
-                    <p className="head5 card-title">{todo.title}</p>
-                    <p className="body2 card-description">{todo.desc}</p>
-                    <p className="body3 card-deadline">마감일 : 2025. 00. 00</p>
-                </div>
-            ))}
-            </div>
-
-
-            {create && (
-                <div className="main-overlay" onClick={()=> setCreate(false)}>
-                {todo.map((todo) => (
-                    <div key={todo.id} className="main-container" onClick={(e)=>e.stopPropagation()}>
-                        <div className="main-title">
-                            <p className="head3 main-title-text">{todo.title}</p>
-                            <img src="/icon-cross.svg" width={24} height={24} onClick={()=> setCreate(false)}/>
-                        </div>
-                        <div className="main-state">
-                            <h1 className="head4" style={{color:"black"}}> 버튼 자리</h1>
-                            <h1 className="body2" style={{color:"black"}}> 만료일 선택 자리 </h1>
-                        </div>
-                        <div className="main-description">
-                            <p className="body1 main-description-text">{todo.desc}</p>
-                        </div>
-                    </div>
-                ))}
-                </div>
-            )}
+            {todos.map((todo) =>
+                <Card key={todo.id} todo={todo}/>
+              )}
         </div>
     )
+}
+
+export function Card ({ todo }) {
+    console.log("🧪 Card 내부 todo 확인:", todo);
+    return (
+        <Link href={`/${todo.id}`} className="card-container">
+            <p className="head5 card-title">{todo.title}</p>
+            <p className="body2 card-description">{todo.desc}</p>
+            <p className="body3 card-deadline">마감일 : 2025. 00. 00</p>
+        </Link>
+    );
 }
 
 export function HoldTodoButton() {

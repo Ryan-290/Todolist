@@ -1,19 +1,26 @@
 "use client";
+
 import "@/style/style.css";
 import "@/style/typo.css";
 import Image from "next/image";
-import { useState } from "react";
-import { saveTodo } from "@/lib/firebaseUtils";
+import { Children, useState } from "react";
+import { deleteTodo, saveTodo, updateTodo } from "@/lib/firebaseUtils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import datepicker from "react-datepicker";
 
 
 export function SaveButton ({handleSave}) {
     return (
         <div className="create-button-layer" onClick={handleSave} >
-            <img src="/icon-save.svg" width={20} height={20} style={{color:"white"}} />
+            <img src="/icon-white-save.svg" width={20} height={20}/>
             <h1 className="head5" style={{color:"white"}}>저장하기</h1>
         </div>
     )
+}
+
+export function DateSelect ({className, children}) {
+    
 }
 
 export function HeaderHomeButton () {
@@ -86,3 +93,104 @@ export function CreateButton() {
         </div>
     )
 };
+
+export function CloseButton ({children, className}) {
+    const router = useRouter();
+    return (
+        <div 
+            onClick={()=>router.back()}
+            className={className}
+            >    
+            {children}
+        </div>
+    )
+}
+
+
+export function DeleteButton ({ id, onDeleted, children, className}) {
+    const [closeconfirm, setCloseconfirm] = useState(false);
+    const handleDelete = async () => {
+        await deleteTodo(id);
+        setCloseconfirm(false);
+        onDeleted && onDeleted(); // 삭제 후 부모 컴포넌트에 알려줌 (리렌더링용)
+    }
+    return (
+      <div>
+        {!closeconfirm ? (
+            <div className={className} onClick={()=>setCloseconfirm(true)}>
+            {children}
+            </div>
+        ) : (
+            <div className = "delete-confirm-back">
+                <div className="delete-confirm">
+                    <h1 className="head4"> 정말 삭제하시겠습니까? </h1>
+                    <div className="delete-clickbox">
+                        <div className="delete-click head5" onClick={handleDelete}> 네 </div>
+                        <div className="head5"> | </div>
+                        <div className="delete-click head5" onClick={()=>setCloseconfirm(false)}> 아니요 </div>
+                    </div>
+                </div>
+            </div>
+
+        )}
+      </div>
+    )
+};
+
+
+export const EditButton = ({ todo, onUpdated, className, children }) => {
+    const [editing, setEditing] = useState(false);
+    const [newTitle, setNewTitle] = useState(todo?.title || "");
+    const [newDesc, setNewDesc] = useState(todo?.desc || "");
+  
+    const handleUpdate = async () => {
+      await updateTodo(todo.id, newTitle, newDesc);
+      setEditing(false);
+      onUpdated && onUpdated(); // 수정 후 부모 컴포넌트에 알려줌
+    };
+  
+    return (
+      <div>
+        {!editing ? (
+        <div className={className} onClick={() => setEditing(true)}>
+            {children}
+        </div>
+            ) : (
+            <div className="main-overlay">
+            <div className="main-container">
+                <div className="main-title">
+                    <input 
+                        type="text" 
+                        className="head3 main-title-text"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}/>
+                    <CloseButton>
+                        <img src="/icon-cross.svg" className="close-button-icon"/>
+                    </CloseButton>
+                </div>
+                <div className="main-state">
+                    <h1 className="head4" style={{color:"black"}}> 버튼 자리</h1>
+                    <h1 className="body2" style={{color:"black"}}> 만료일 선택 자리 </h1>
+                </div>
+                <div className="main-description">
+                    <textarea
+                        type="text"
+                        className="body1 main-description-text"
+                        value={newDesc}
+                        onChange={(e) => setNewDesc(e.target.value)}/>
+                </div>
+                <div className="update-confirm" onClick={handleUpdate}>
+                    <img src="/icon-confirm-white.svg" className="update-icon"/>
+                    <h1 className="head5" style={{color:"white"}}>수정완료</h1>
+                </div>
+                <div className="update-cancel" onClick={() => setEditing(false)}>
+                    <img src="/icon-white-cross.svg" className="update-icon"/>
+                    <h1 className="head5" style={{color:"white"}}>수정취소</h1>
+                </div>
+            </div>
+        </div>
+        )}
+      </div>
+    );
+  };
+  

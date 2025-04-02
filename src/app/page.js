@@ -2,7 +2,7 @@ import Image from "next/image";
 import "@/style/style.css";
 import "@/style/typo.css";
 import { CreateButton } from "@/component/button";
-import { TodoCard } from "@/component/card";
+import { Card, TodoCardlist } from "@/component/card";
 
 export default function Home() {
   return (
@@ -14,7 +14,7 @@ export default function Home() {
             <p className="body1" style={{flexGrow:1}}>002</p>
             <CreateButton/>
         </div>
-        <TodoCard/>
+        <TodoCardlist></TodoCardlist>
     </div>
 
     <div className="ing-container">
@@ -22,7 +22,7 @@ export default function Home() {
             <p className="body1">진행 중(-ing)</p>
             <p className="body1" style={{flexGrow:1}}>003</p>
         </div>
-        <TodoCard/>
+        <TodoCardlist></TodoCardlist>
     </div>
 
     <div className="end-container">
@@ -30,9 +30,10 @@ export default function Home() {
             <p className="body1">완료(End)</p>
             <p className="body1" style={{flexGrow:1}}>004</p>
         </div>
-        <TodoCard/>
+     
     </div>
-        
+
+
   </div>
 
 
