@@ -6,13 +6,12 @@ import { useEffect , useState } from "react";
 import Link from "next/link";
 import { loadTodos } from "@/lib/firebaseUtils";
 import { getAllDocs } from "@/lib/firebaseUtils"
+import { format } from "date-fns"; 
 
 export function TodoCardlist () {
     const [todos, setTodos] = useState([]);
     useEffect(() => {
-        console.log("🔥 컴포넌트 마운트됨");
         const unsubscribe = loadTodos((data) => {
-        console.log("데이터 확인 2", data)
           setTodos(data);
         });
         return () => unsubscribe();
@@ -28,12 +27,12 @@ export function TodoCardlist () {
 }
 
 export function Card ({ todo }) {
-    console.log("🧪 Card 내부 todo 확인:", todo);
     return (
         <Link href={`/${todo.id}`} className="card-container">
             <p className="head5 card-title">{todo.title}</p>
             <p className="body2 card-description">{todo.desc}</p>
-            <p className="body3 card-deadline">마감일 : 2025. 00. 00</p>
+            <p className="body3 card-deadline">마감일 : {todo.deadline && typeof todo.deadline.toDate === 'function'
+                ? format(todo.deadline.toDate(), 'yyyy. MM. dd'):'없음'}</p>
         </Link>
     );
 }

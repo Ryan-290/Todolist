@@ -6,10 +6,8 @@ import { collection, addDoc, serverTimestamp, query , updateDoc ,orderBy, getDoc
 // Firestore에서 Todos 불러오기
 
 export const loadTodos = (callback) => {
-  console.log("✅ loadTodos 함수 호출됨");
   const q = query(collection(db, "todos"), orderBy("createdAt","asc"));
   const unsubscribe = onSnapshot(q, (snapshot) => {
-    console.log("📸 스냅샷 도착!");
     const todos = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data()
@@ -29,11 +27,13 @@ export const getTodoById = async (id) => {
 }
 
 // Firestore에 Todo 추가하기
-export const saveTodo = async (title, desc)=>{
+export const saveTodo = async (title, desc, deadline, selected)=>{
     try {
         const docRef = await addDoc(collection(db, "todos"),{
             title,
             desc,
+            deadline,
+            selected,
             createdAt : serverTimestamp(),
         });
         return docRef.id;
@@ -52,19 +52,18 @@ export const deleteTodo = async (id) => {
 
   try {
     await deleteDoc(doc(db, "todos", id));
-    console.log("삭제 성공");
   } catch (error) {
     console.error("삭제 실패:", error);
   }
 };
 
-export const updateTodo = async (id, newTitle, newDesc) => {
+export const updateTodo = async (id, newTitle, newDesc, newDeadline) => {
   try {
     await updateDoc(doc(db, "todos", id), {
       title: newTitle,
       desc: newDesc,
+      deadline : newDeadline
     });
-    console.log("수정 성공");
   } catch (error) {
     console.error("수정 실패:", error);
   }

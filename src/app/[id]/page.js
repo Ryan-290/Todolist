@@ -3,6 +3,7 @@ import "@/style/typo.css";
 import Image from "next/image";
 import { getTodoById } from "@/lib/firebaseUtils";
 import { CloseBlock, CloseButton, DeleteButton, EditButton } from "@/component/button";
+import { format } from "date-fns"; 
 
 export default async function ContentPage ({params}) {
     const resolvetodo = await params;
@@ -10,7 +11,9 @@ export default async function ContentPage ({params}) {
     const rawtodo = {
         id : todo.id,
         title : todo.title,
-        desc : todo.desc
+        desc : todo.desc,
+        deadline : todo.deadline,
+        selected : todo.selected
     }
     
     return (
@@ -23,8 +26,11 @@ export default async function ContentPage ({params}) {
                     </CloseButton>
                 </div>
                 <div className="main-state">
-                    <h1 className="head4" style={{color:"black"}}> 버튼 자리</h1>
-                    <h1 className="body2" style={{color:"black"}}> 만료일 선택 자리 </h1>
+                    <h1 className="head4 state-button">
+                        {todo.selected}
+                        <img src="/icon-state.svg" className="state-button-icon" /> </h1>
+                    <h1 className="body2" style={{color:"black"}}> 만료일 : {todo.deadline && typeof todo.deadline.toDate === 'function'
+    ? format(todo.deadline.toDate(), 'yyyy. MM. dd'):'없음'} </h1>
                 </div>
                 <div className="main-description">
                     <p className="body1 main-description-text">{todo.desc}</p>

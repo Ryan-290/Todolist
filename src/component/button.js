@@ -3,24 +3,33 @@
 import "@/style/style.css";
 import "@/style/typo.css";
 import Image from "next/image";
-import { Children, useState } from "react";
+import { Children, useState, useEffect } from "react";
 import { deleteTodo, saveTodo, updateTodo } from "@/lib/firebaseUtils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import datepicker from "react-datepicker";
-
+import DatePicker from "react-datepicker";
+import { format } from "date-fns"; 
+import 'react-datepicker/dist/react-datepicker.css';
+import { StateButton } from "./ statebutton";
 
 export function SaveButton ({handleSave}) {
     return (
-        <div className="create-button-layer" onClick={handleSave} >
+        <button className="create-button-layer" onClick={handleSave} >
             <img src="/icon-white-save.svg" width={20} height={20}/>
             <h1 className="head5" style={{color:"white"}}>저장하기</h1>
-        </div>
+        </button>
     )
 }
 
-export function DateSelect ({className, children}) {
-    
+export function DateSelect ({className, children, deadlinedata, onchange}) {
+    return (
+        <DatePicker
+            className={className}
+            selected={deadlinedata}
+            onChange={onchange}
+            dateFormat = "yyyy년 MM월 dd일"
+            isClearable>{children}</DatePicker>
+    )
 }
 
 export function HeaderHomeButton () {
@@ -45,16 +54,20 @@ export function CreateButton() {
     const [create, setCreate] = useState(false);
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
+    const [deadline, setDeadline] = useState(null);
+    const [selected, setSelected] = useState("todo");
     const handleSave = async () => {
         if (!title.trim()) {
             alert("제목을 입력해주세요!!")
             return;
         }
-        const id = await saveTodo(title, desc);
-            alert(`"할 일이 저장되었습니다 !" (ID:${id})`);
+        const id = await saveTodo(title, desc, deadline);
             setTitle("");
             setDesc("");
-            }
+            setDeadline(null);
+            setSelected("todo");
+            setCreate(false);
+        };
 
     return (
         <div>
@@ -75,8 +88,14 @@ export function CreateButton() {
                             <img src="/icon-cross.svg" width={24} height={24} onClick={()=> setCreate(false)}/>
                         </div>
                         <div className="main-state">
-                            <h1 className="head4" style={{color:"black"}}> 버튼 자리</h1>
-                            <h1 className="body2" style={{color:"black"}}> 만료일 선택 자리 </h1>
+                            <StateButton className="head4" selected={selected} setSelected={setSelected}/>
+                            <DateSelect 
+                                className="body2"
+                                deadlinedata={deadline}
+                                onchange={(date) => setDeadline(date)}
+                                > 만료일 선택
+                            </DateSelect>
+                            
                         </div>
                         <div className="main-description">
                             <textarea
@@ -109,10 +128,12 @@ export function CloseButton ({children, className}) {
 
 export function DeleteButton ({ id, onDeleted, children, className}) {
     const [closeconfirm, setCloseconfirm] = useState(false);
+    const router = useRouter();
     const handleDelete = async () => {
         await deleteTodo(id);
         setCloseconfirm(false);
-        onDeleted && onDeleted(); // 삭제 후 부모 컴포넌트에 알려줌 (리렌더링용)
+        onDeleted && onDeleted();
+        router.push("/"); 
     }
     return (
       <div>
@@ -142,13 +163,16 @@ export const EditButton = ({ todo, onUpdated, className, children }) => {
     const [editing, setEditing] = useState(false);
     const [newTitle, setNewTitle] = useState(todo?.title || "");
     const [newDesc, setNewDesc] = useState(todo?.desc || "");
-  
+    const [newDeadline, setNewDeadline] = useState(todo?.deadline?.toDate ? todo.deadline.toDate() : null);
+    const router = useRouter();
+
     const handleUpdate = async () => {
-      await updateTodo(todo.id, newTitle, newDesc);
+      await updateTodo(todo.id, newTitle, newDesc, newDeadline);
       setEditing(false);
       onUpdated && onUpdated(); // 수정 후 부모 컴포넌트에 알려줌
+      router.push("/"); 
     };
-  
+
     return (
       <div>
         {!editing ? (
@@ -170,7 +194,12 @@ export const EditButton = ({ todo, onUpdated, className, children }) => {
                 </div>
                 <div className="main-state">
                     <h1 className="head4" style={{color:"black"}}> 버튼 자리</h1>
-                    <h1 className="body2" style={{color:"black"}}> 만료일 선택 자리 </h1>
+                    <DateSelect 
+                        className="body2"
+                        deadlinedata={newDeadline}
+                        onchange={(date) => setNewDeadline(date)}
+                        > 만료일 수정
+                    </DateSelect>
                 </div>
                 <div className="main-description">
                     <textarea

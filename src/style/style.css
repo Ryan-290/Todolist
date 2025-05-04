@@ -485,10 +485,12 @@ a {
 }
 
 .state-button {
+    box-sizing: border-box;
     text-decoration: none;
     position: relative ;
     display : inline-flex ;
-    justify-content: center; 
+    justify-content: center;
+    align-items: center;
     gap : 8px ;
     width : 156px ;
     height : 35px ;
@@ -496,13 +498,41 @@ a {
     background-color: transparent;
     border : 0.5px solid var(--gray50) ;
     border-radius: 8px;
-    cursor: pointer;
+     cursor: pointer;
     user-select: none;
 }
 
+.state-button-text {
+    width : 100px ;
+    color: #000000;
+    cursor: pointer;
+}
+
+.state-button-icon {
+    width : 16px ;
+    height : 16px ;
+}
+ 
 .state-icon {
     width : 20px ;
     height : 20px ;
+}
+
+.state-button-open {
+    box-sizing: border-box;
+    position: absolute;
+    top : 100%;
+    left : 0;
+    width : 156px ;
+    height : auto ;
+    border : 0.5px solid var(--gray50) ;
+    border-radius: 8px;
+    background-color: white;
+    flex-direction: column;
+    display : flex;
+    gap : 16px;
+    padding : 16px;
+    z-index: 1000;
 }
 
 /*보류페이지*/
